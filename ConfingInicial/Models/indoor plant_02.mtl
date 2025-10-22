@@ -1,0 +1,103 @@
+Aquí tienes el código completo y corregido del archivo de materiales (indoor plant_02.mtl).
+
+He solucionado los siguientes problemas:
+
+Ruta de las texturas: El archivo original buscaba las texturas en una subcarpeta llamada textures\. He eliminado esa ruta porque, según las imágenes que me enviaste, tus texturas están en la misma carpeta que el archivo .obj y .mtl.
+
+Nombres de archivo: He corregido los nombres de las texturas para que coincidan exactamente con los archivos que me mostraste: indoor plant_2_COL.jpg y indoor plant_2_NOR.jpg.
+
+Línea corrupta: He arreglado el último bloque de material que tenía un error de sintaxis. Lo reestructuré para que el programa pueda leerlo correctamente.
+
+Código indoor plant_02.mtl corregido
+Abre tu archivo indoor plant_02.mtl, borra todo el contenido y reemplázalo por el siguiente código.
+
+# Blender MTL File: 'indoor plant_02.blend'
+# Material Count: 7
+
+newmtl IDP_Pot
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd indoor plant_2_NOR.jpg
+map_Bump indoor plant_2_NOR.jpg
+map_Ks indoor plant_2_COL.jpg
+
+newmtl IDP_ground
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd indoor plant_2_NOR.jpg
+map_Bump indoor plant_2_NOR.jpg
+
+newmtl IDP_leaves
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd indoor plant_2_COL.jpg
+map_Bump indoor plant_2_NOR.jpg
+map_Ks indoor plant_2_COL.jpg
+
+newmtl IDP_leaves_indoor_plant_2_NOR.jpg
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd indoor plant_2_NOR.jpg
+map_Bump indoor plant_2_NOR.jpg
+map_Ks indoor plant_2_COL.jpg
+
+newmtl IDP_root
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.328250 0.328250 0.328250
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd indoor plant_2_COL.jpg
+map_Bump indoor plant_2_NOR.jpg
+map_Ks indoor plant_2_COL.jpg
+
+newmtl IDP_root_indoor_plant_2_NOR.jpg
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.328250 0.328250 0.328250
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd indoor plant_2_NOR.jpg
+map_Bump indoor plant_2_NOR.jpg
+map_Ks indoor plant_2_COL.jpg
+
+newmtl Material.006
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd indoor plant_2_COL.jpg
