@@ -1,7 +1,8 @@
-// Jenyfer Estefanya Sánchez Gachuz
-// Fecha de entrega 21 de octubre del 2025
-// 319025901
-// Previo 10
+//Práctica 10
+//Jenyfer Estefanya Sánchez Gachuz
+//319025901
+//Fecha de entrega 26 de octubre de 2025
+
 
 #include <iostream>
 #include <cmath>
@@ -105,12 +106,15 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 //Anim
-// 
-// Animación vertical suave de la pelota
-float ballY = 0.0f;      // Altura de la pelota
-bool AnimBall = false;    // Control de animación
-float t = 0.0f;           // Tiempo acumulado para la función seno
 
+float rotDog = 0;
+float rotBall = 0;
+
+float jumpProgress = 0.0f;
+float tiltDog = 0.0f;
+float transDogY = 0.0f;
+float transBallY = 0.0f;
+bool AnimBall = false;
 
 
 // Deltatime
@@ -121,15 +125,8 @@ int main()
 {
 	// Init GLFW
 	glfwInit();
-	// Set all the required options for GLFW
-	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
-	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Jenyfer_Sanchez_Animacion basica", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Jenyfer Sanchez Practica 10", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -204,7 +201,7 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
+		
 		glfwPollEvents();
 		DoMovement();
 		Animation();
@@ -215,10 +212,6 @@ int main()
 
 		// OpenGL options
 		glEnable(GL_DEPTH_TEST);
-
-
-
-
 
 
 		// Use cooresponding shader when setting uniforms/drawing objects
@@ -286,8 +279,6 @@ int main()
 
 		glm::mat4 model(1);
 
-
-
 		//Carga de modelo 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
@@ -295,6 +286,10 @@ int main()
 		Piso.Draw(lightingShader);
 
 		model = glm::mat4(1);
+		model = glm::rotate(model, glm::radians(rotDog), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, tiltDog, glm::vec3(1.0f, 0.0f, 0.0f)); // inclinacion
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, transDogY, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Dog.Draw(lightingShader);
@@ -304,7 +299,10 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		model = glm::translate(model, glm::vec3(0.0f, ballY, 0.0f));
+		model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, transBallY, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Ball.Draw(lightingShader);
 		glDisable(GL_BLEND);  //Desactiva el canal alfa 
@@ -452,12 +450,37 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 }
 void Animation() {
-	if (AnimBall) {
-		t += deltaTime;
-		ballY = 0.3f + sin(t * 1.5f) * 0.6f; // Ajusta amplitud y frecuencia según quieras
+	if (AnimBall)
+	{
+		rotBall += 0.16f;
+		rotDog -= 0.16f;
+		jumpProgress += 0.158f;
+
+		float mod180 = fmod(jumpProgress, 180.0f);
+		if (mod180 >= 160.0f || mod180 <= 20.0f)
+		{
+			float angleAround180 = mod180 <= 20.0f ? mod180 + 20.0f : mod180 - 160.0f;
+			float t = angleAround180 / 40.0f;
+			float tilt = sin((angleAround180 / 40.0f) * glm::pi<float>());
+			tiltDog = glm::radians(20.0f) * tilt;
+
+			transDogY = sin(t * glm::pi<float>()) * 0.5f;
+			transBallY = -sin(t * glm::pi<float>()) * 0.5f;
+
+
+		}
+		else
+		{
+			tiltDog = 0.0f;
+			transDogY = 0.0f;
+			transBallY = 0.0f;
+		}
+	}
+	else
+	{
+		//rotBall = 0.0f;
 	}
 }
-
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
