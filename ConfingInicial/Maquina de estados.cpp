@@ -1,3 +1,8 @@
+//Jenyfer Estefanya Sánchez Gachuz 
+//319025901
+//Practica 11
+//Fecha de entrega 02 de noviembre
+
 #include <iostream>
 #include <cmath>
 
@@ -131,7 +136,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Animacion maquina de estados Francisco Reynoso", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Jenyfer Sanchez Practica 11", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -316,7 +321,7 @@ int main()
 		model = glm::rotate(model, glm::radians(head), glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		HeadDog.Draw(lightingShader);
-		////Tail 
+		//Tail 
 		model = modelTemp;
 		model = glm::translate(model, glm::vec3(0.0f, 0.026f, -0.288f));
 		model = glm::rotate(model, glm::radians(tail), glm::vec3(0.0f, 0.0f, -1.0f));
@@ -501,83 +506,121 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 	if (keys[GLFW_KEY_B])
 	{
-		dogAnim = 1;   // caminar hacia +Z
+		dogAnim = 1;
 	}
-
 	if (keys[GLFW_KEY_V])
 	{
-		dogAnim = -1;  // caminar hacia -Z
+		dogAnim = 0;
+
 	}
 
 }
+int pathState = 0; // 0 a 6, cada uno es un paso
+float advanceCounter = 0.0f; // para medir cu?nto ha avanzado
+float rotationTarget = 0.0f; // para rotaciones controladas
+
+
 void Animation() {
-	if (AnimBall) {
+	if (AnimBall)
 		rotBall += 0.4f;
-	}
-	if (AnimDog) {
-		rotDog -= 0.6f;
-	}
 
-	// ---------- Parámetros locales (ajústalos a tu escena) ----------
-	const float stepZ = 0.01f;   // avance por frame
-	const float zMax = 1.50f;  // límite frontal (antes de caer, +Z)
-	const float zMin = -1.50f; // límite trasero (antes de salir del pasto, -Z)
-	// ----------------------------------------------------------------
+	if (dogAnim == 1) {
+		switch (pathState) {
+		case 0: // Avanzar
+			dogPos.z += 0.002f;
+			advanceCounter += 0.002f;
+			if (advanceCounter >= 2.1f) {
+				advanceCounter = 0;
+				rotationTarget = dogRot + 90.0f;
+				pathState = 1;
+			}
+			break;
 
-	if (dogAnim != 0) {
-		// Ciclo de patas (igual para avanzar y retroceder)
+		case 1: // Girar 90?
+			dogRot += 0.6f;
+			if (dogRot >= rotationTarget) {
+				dogRot = rotationTarget;
+				pathState = 2;
+			}
+			break;
+
+		case 2: // Avanzar
+			dogPos.x += 0.002f;
+			advanceCounter += 0.002f;
+			if (advanceCounter >= 2.0f) {
+				advanceCounter = 0;
+				rotationTarget = dogRot + 90.0f;
+				pathState = 3;
+			}
+			break;
+
+		case 3: // Girar 90?
+			dogRot += 0.6f;
+			if (dogRot >= rotationTarget) {
+				dogRot = rotationTarget;
+				pathState = 4;
+			}
+			break;
+
+		case 4: // Avanzar
+			dogPos.z -= 0.002f;
+			advanceCounter += 0.002f;
+			if (advanceCounter >= 3.5f) {
+				advanceCounter = 0;
+				rotationTarget = dogRot + 135.0f;
+				pathState = 5;
+			}
+			break;
+
+		case 5: // Girar 135?
+			dogRot += 0.6f;
+			if (dogRot >= rotationTarget) {
+				dogRot = rotationTarget;
+				pathState = 6;
+			}
+			break;
+
+		case 6: // Avanzar
+			dogPos.x -= 0.002f;
+			dogPos.z += 0.002f;
+			advanceCounter += 0.002f;
+			if (advanceCounter >= 2.0f) {
+				advanceCounter = 0;
+				rotationTarget = dogRot + 45.0f;
+				pathState = 7;
+			}
+			break;
+
+		case 7: // Girar 45? a la izquierda
+			dogRot += 0.6f;
+			if (dogRot >= rotationTarget) {
+				dogRot = rotationTarget;
+				pathState = 8; // estado final para detener todo
+			}
+			break;
+
+		case 8: // Reinicio autom?tico
+			dogAnim = 0; // detener animaci?n
+			pathState = 0;
+			// dogAnim = 1; //para repetir la animacion 
+			break;
+
+
+		}
+
+		// Animaci?n de piernas
 		if (!step) {
-			if (FLegs < 30.0f && RLegs > -30.0f) {
-				FLegs += 0.6f;
-				RLegs -= 0.6f;
-				head += 0.3f;
-				tail -= 0.3f;
-			}
-			else {
-				step = true;
-			}
+			RLegs += 0.3f; FLegs += 0.3f; head += 0.3f; tail += 0.3f;
+			if (RLegs > 15.0f) step = true;
 		}
 		else {
-			if (FLegs > -30.0f && RLegs < 30.0f) {
-				FLegs -= 0.6f;
-				RLegs += 0.6f;
-				head -= 0.3f;
-				tail += 0.3f;
-			}
-			else {
-				step = false;
-			}
+			RLegs -= 0.3f; FLegs -= 0.3f; head -= 0.3f; tail -= 0.3f;
+			if (RLegs < -15.0f) step = false;
 		}
 
-		// Movimiento con límites
-		if (dogAnim == 1) {
-			// Avance hacia +Z
-			float nextZ = dogPos.z + stepZ;
-			if (nextZ >= zMax) {
-				dogPos.z = zMax;     // clamp
-				dogAnim = 0;        // detener caminata
-				// Pose neutra opcional
-				FLegs = RLegs = head = tail = 0.0f;
-			}
-			else {
-				dogPos.z = nextZ;
-			}
-		}
-		else if (dogAnim == -1) {
-			// Retroceso hacia -Z
-			float nextZ = dogPos.z - stepZ;
-			if (nextZ <= zMin) {
-				dogPos.z = zMin;     // clamp
-				dogAnim = 0;        // detener caminata
-				// Pose neutra opcional
-				FLegs = RLegs = head = tail = 0.0f;
-			}
-			else {
-				dogPos.z = nextZ;
-			}
-		}
 	}
 }
+
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
