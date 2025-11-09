@@ -2,6 +2,7 @@
 //319025901
 //Previo 12 - Modificado: Perro se sienta y saluda
 //Fecha de entrega 04 de noviembre
+#include <fstream>
 #include <iostream>
 #include <cmath>
 
@@ -191,6 +192,89 @@ void interpolation(void)
 // Deltatime
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
+void saveKeyFramesToFile(const char* filename)
+{
+	std::ofstream file(filename);
+
+	if (!file.is_open())
+	{
+		printf("Error: No se pudo crear el archivo %s\n", filename);
+		return;
+	}
+
+	// Guardar el número de frames
+	file << FrameIndex << std::endl;
+
+	// Guardar cada keyframe
+	for (int i = 0; i < FrameIndex; i++)
+	{
+		file << KeyFrame[i].dogPosX << " "
+			<< KeyFrame[i].dogPosY << " "
+			<< KeyFrame[i].dogPosZ << " "
+			<< KeyFrame[i].rotDog << " "
+			<< KeyFrame[i].head << " "
+			<< KeyFrame[i].bodyRotX << " "
+			<< KeyFrame[i].RLegs << " "
+			<< KeyFrame[i].FRightLeg << " "
+			<< KeyFrame[i].tail << std::endl;
+	}
+
+	file.close();
+	printf("Keyframes guardados exitosamente en %s\n", filename);
+}
+
+void loadKeyFramesFromFile(const char* filename)
+{
+	std::ifstream file(filename);
+
+	if (!file.is_open())
+	{
+		printf("Error: No se pudo abrir el archivo %s\n", filename);
+		return;
+	}
+
+	// Leer el número de frames
+	file >> FrameIndex;
+
+	if (FrameIndex > MAX_FRAMES)
+	{
+		printf("Error: El archivo contiene más frames (%d) que el máximo permitido (%d)\n",
+			FrameIndex, MAX_FRAMES);
+		FrameIndex = 0;
+		file.close();
+		return;
+	}
+
+	// Leer cada keyframe
+	for (int i = 0; i < FrameIndex; i++)
+	{
+		file >> KeyFrame[i].dogPosX
+			>> KeyFrame[i].dogPosY
+			>> KeyFrame[i].dogPosZ
+			>> KeyFrame[i].rotDog
+			>> KeyFrame[i].head
+			>> KeyFrame[i].bodyRotX
+			>> KeyFrame[i].RLegs
+			>> KeyFrame[i].FRightLeg
+			>> KeyFrame[i].tail;
+
+		// Inicializar los incrementos en 0
+		KeyFrame[i].incX = 0;
+		KeyFrame[i].incY = 0;
+		KeyFrame[i].incZ = 0;
+		KeyFrame[i].rotDogInc = 0;
+		KeyFrame[i].headInc = 0;
+		KeyFrame[i].bodyRotXInc = 0;
+		KeyFrame[i].RLegsInc = 0;
+		KeyFrame[i].FRightLegInc = 0;
+		KeyFrame[i].tailInc = 0;
+	}
+
+	file.close();
+	printf("Keyframes cargados exitosamente desde %s (%d frames)\n", filename, FrameIndex);
+}
+
 
 int main()
 {
@@ -559,30 +643,6 @@ void DoMovement()
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (keys[GLFW_KEY_L])
-	{
-		if (play == false && (FrameIndex > 1))
-		{
-			resetElements();
-			interpolation();
-			play = true;
-			playIndex = 0;
-			i_curr_steps = 0;
-		}
-		else
-		{
-			play = false;
-		}
-	}
-
-	if (keys[GLFW_KEY_K])
-	{
-		if (FrameIndex < MAX_FRAMES)
-		{
-			saveFrame();
-		}
-	}
-
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -597,6 +657,48 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		else if (action == GLFW_RELEASE)
 		{
 			keys[key] = false;
+		}
+	}
+
+	// Solo ejecutar una vez al presionar
+	if (action == GLFW_PRESS)
+	{
+		// Reproducir animación
+		if (key == GLFW_KEY_L)
+		{
+			if (play == false && (FrameIndex > 1))
+			{
+				resetElements();
+				interpolation();
+				play = true;
+				playIndex = 0;
+				i_curr_steps = 0;
+			}
+			else
+			{
+				play = false;
+			}
+		}
+
+		// Guardar keyframe
+		if (key == GLFW_KEY_K)
+		{
+			if (FrameIndex < MAX_FRAMES)
+			{
+				saveFrame();
+			}
+		}
+
+		// Guardar keyframes a archivo
+		if (key == GLFW_KEY_M)
+		{
+			saveKeyFramesToFile("animacion_perro.txt");
+		}
+
+		// Cargar keyframes desde archivo
+		if (key == GLFW_KEY_N)
+		{
+			loadKeyFramesFromFile("animacion_perro.txt");
 		}
 	}
 
